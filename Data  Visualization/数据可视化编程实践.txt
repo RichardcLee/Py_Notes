@@ -1,0 +1,662 @@
+/*------------------------------------了解数据----------------------------------------*/
+#--* 从csv导入数据
+ch02-csvread.py
+
+
+#--* 从Microsoft Excel导入数据
+ch02-export.py
+使用xlrd模块
+
+
+#--* 从定宽数据文件导入数据，数据使用ch02-generate_f_data.py生成
+ch02-fixedwidth-read.py
+使用内置模块struct，性能好
+
+
+#--* 从制表符分隔的文件中读取数据
+1.python 的 csv 模块支持读写“方言”格式的文件，是哪一种方言可以通过文件后缀名判断
+ch02-tabread.py
+2.含脏数据的读取方法，先进行数据清洗
+ch02-tabread-split.py
+
+
+#--* 读取json数据源导入数据
+ch02-jsonread-github.py
+
+
+#--* 从数据库数据源导入数据
+
+
+#--* 清理异常值(outlier)
+1.中位数绝对偏差(Median absolute deviation, MAD)用来描述单变量（包含一个变量）样本在定量数据中可变性的一种标准。它通常用来度量统计分布，因为它会落在一组稳健统计数据中，因此对异常值有抵抗能力。
+ch02-clean-mad.py    其中第一幅图只能显示最大异常值，第二幅图由于提出了异常值而显示了正常的数据
+2.通过人眼识别：散点图（scatter）、箱线图（box plot）。
+ch02-clean-boxplot.py    代码中，箱线图里x表示异常值
+3.有些时候相同的数据（本例中是均匀分布的）在不同情况下看起来截然不同，甚至欺骗性的传递了一些信息！
+ch02-clean-log.py
+4.数据有缺失值（missing value），可以用Numpy加载器来补偿缺失值，或者写代码来替换成我们需要的值。
+5.一些商业的和非商业的产品（如OpenRefine，参见github）提供了针对实时脏数据的一些自动化处理，但是人工参与数据清洗十分必要！
+更多异常值清理和常规数据清理的知识，可以看一看概率模型（statistical models）和采样理论（sampling theory）。
+
+
+#--* 读取大块数据
+ch02-chunk-read.py
+补充：并行方法MapReduce范式，多进程处理（multiprocessing），大文件重复处理还可以建立自己的数据管道。
+
+
+#--* 读取流数据源
+数据来自一个连续的数据源，或者需要读取连续数据，或者数据实时变化
+import os
+import time
+
+with open(filename, 'r') as f:
+    filesize = os.stat(filename)[6]
+    f.seek(filesize)
+    while True:
+        where = f.tell()
+        line = f.readline()
+        if not line:
+            time.sleep(1)
+            f.seek(where)
+        else:
+            print(line)
+            # do something
+
+'''
+本例中的概念可以应用到许多解决方案上。例如：输入是一个类文件对象或者一个远程HTTP资源，就可以从远程服务读取输入信息、并持续解析他，然后实时更新图表、数据库、缓存或中间队列。
+复杂的数据管道中，需要启动消息队列（message queue）。
+
+'''
+
+
+#--* 导入图像数据到Numpy数组
+使用Numpy和Scipy处理图像
+ch02-imgshow-lena.py
+
+ch02-imgshow-pil.py
+
+#加载一个RGB通道的图像，把他转换为单通道的ndarray，然后用数组切片的方式放大图像，这里是实际上是选取了图像的一部分
+ch02-imgshow-zoom.py
+
+# 自己的总结
+from PIL import Image
+import numpy as np
+import scipy
+import imageio
+import matplotlib.pyplot as plt
+
+pbug = Image.open('stinkbug.png')
+
+# original img
+bug = imageio.imread('stinkbug.png')
+# zoom img
+zbug = bug[100:350, 140:350]
+# gray img
+gbug = bug[...,0]
+# 另一种方式
+pbug = np.array(pbug.getdata()).reshape((pbug.height,pbug.width,3))
+
+plt.figure(1)
+
+plt.subplot(221)
+plt.imshow(bug)
+plt.title('original bug')
+
+plt.subplot(222)
+plt.imshow(zbug)
+plt.title('zoom bug')
+
+plt.subplot(223)
+plt.imshow(gbug)
+plt.title('gray img')
+
+plt.subplot(224)
+plt.imshow(pbug)
+plt.title('other method')
+
+plt.show()
+
+
+#--* 对于大图像，推荐使用numpy.memmap来做图像的内存映射，可以加快操作速度
+import numpy
+file_name = 'stinkbug.png'
+image = numpy.memmap(file_name, dtype=uint8, shape=(375,300))
+
+
+#--* scikit-learn 专注于图像处理的专业软件包，如:边缘检测、图像去噪、或者轮廓查找等！
+http://scikit-image.org/docs/dev/auto_examples/
+
+
+#--* 生成可控的随机数据集合
+本节展示生成随机数字序列和单词序列的方法
+
+# 生成一个简单随机样本
+ch02-random-random.py，如果想让值区间从0-1变为1-6，可以使用random.randint(min,max)；浮点数random.uniform(min,max)
+
+# 生成虚拟价格增长数据的时序图再加上一些随机噪声
+ch02-random-timeseries.py，使用了正态分布
+
+# 采用不同分布来模拟
+ch02-random-distributions.py，详情见代码
+
+# 如果想避免生成的序列重复，推荐使用random.SystemRandom
+ch02-random-systemrandom.py
+
+# 如果想获取一些随机的单词
+windows上可以通过Project Gutenberg、Wiktionary、British National Corpus或者Dr Peter Norving的http://norvig.com/big.txt生成的文件。
+
+
+#--* 真实数据的噪声平滑处理!!!
+# 基础算法是基于滚动窗口（rolling window）模式（例如卷积）。窗口滚动过数据，然后计算出窗口内的数据的平均值。
+   平滑数据噪声的一个朴素做法是，对窗口（样本）求平均，然后仅仅绘制出给定窗口的平均值，而不是所有数据点。这也是高级算法的基础。
+ch02-noise-moving-average.py
+
+# 更高级的例子，使用scipy库让窗口平滑处理达到更好的效果。
+以下方法是基于信号（指数据点）窗口的卷积（函数的总和）。在准备信号时用了一些小技巧，向两端添加相同信号的副本并做反射，这样一来，我们就减小了数据的边界效应。
+这段代码来自Scipy Cookbook 一书，参见http://www.scipy.org/Cookbook/SignalSmooth。 
+ch02-noise-scipy-smooth-1d.py
+
+# 另一个非常流行的信号平滑处理算法是中值滤波（Median filter） （另外还有均值滤波、高斯滤波等等），中值滤波中心思想就是逐项地遍历信号，并用相邻信号项的中值替换当前项，这种方法非常快，而且对一维数据和二维数据（图像）都适用。
+下面的例子中我们使用了scipy信号工具箱中的实现
+ch02-noise-median-filter.py
+
+# 必须注意一个问题！并不是一定要对数据进行平滑处理，因为平滑处理或多或少会导致信号失真，从而改变信号波形，对于真实信号而言，平滑处理后的噪声甚至可能是错误的！所以，是否处理取决于应用领域和实际要求！
+
+
+
+
+
+/*-----------------------------------------------------------绘制并定制化图表----------------------------------------------------------*/
+#--* 定义图表类型——柱状图、线形图和堆积柱状图
+# hold(False) 接下来所有图表都将绘制在相同的坐标轴下
+
+# bar()创建垂直柱状图、barh()创建水平柱状图，（柱状图和直方图不一样!!!）
+ch03-rec01-plotting-examples.py
+
+# boxplot创建箱线图
+一个箱线图可以呈现5种数据：最小值，第二四分位数（其以下为数据集合中较低的25%数据），中值（数据集合的中值），第三四分位数（其以上为数据集合中较高的25%数据），最大值
+ch03-rec02-box-vs-histogram.py
+
+
+#--* 简单的正余弦图
+ch03-rec03-sin-cos-simple.py
+
+# 进一步定制化来添加更多的信息，并让坐标轴更精确一些
+ch03-rec04-sin-cos-final.py
+注意这个：
+# format ticks at specific values
+plt.xticks([-np.pi, -np.pi/2, 0, np.pi/2, np.pi],
+          [r'$-\pi$', r'$-\pi/2$', r'$0$', r'$+\pi/2$', r'$+\pi$'])
+plt.yticks([-1, 0, +1],
+          [r'$-1$', r'$0$', r'$+1$'])
+
+
+#--* 设置坐标轴的长度和范围
+l = [xmin, xmax, ymin, ymax]
+plt.axis(l)
+
+# 可以调用plt.autoscale()，该方法会自动计算坐标轴的大小以适应数据的显示！
+
+# 如果想向相同图形中添加新的坐标轴，可以调用plt.axes()方法。我们通常会在方法中传入一些属性，如rect，归一化单位（0，1）下的left、bottom、width、height四个属性，或者axisbg，该参数指定最标轴背景颜色。
+还有其他一些参数允许我们对新添加的坐标轴（x/y）进行设置，如sharex/sharey参数，接收其他坐标轴的值并让当前坐标轴共享相同的值；或者polar参数，指定是否使用极坐标（polar axes）。
+
+# 如果只想添加一条线，可以使用plt.axhline() 或 plt.axvline() 水平线和垂直线。
+
+# 类似的，plt.axhspan() 和 plt.axvspan() 允许我们添加跨坐标轴的水平带(矩形)
+
+# plt.grid()会切换网格显示状态，控制参数：
+which:major、minor或者both
+axis：both、x或者y
+
+# 坐标轴通常由plt.axis()控制。
+matplotlib.axes.Axes 包含操作坐标轴的大多数方法；
+单独一个坐标轴由plt.axis.Axis表示；
+matplotlib.axis.XAxis表示x轴
+matplotlib.axis.YAxis表示y轴
+
+
+#--* 设置图表的线型、属性和格式化字符串
+# 如果你对颜色匹配不是很敏感，可以使用http://Colorbrewer2.org/
+
+# 改变线条属性的方法有三：
+①plot(x, y, linewidth=1.5)
+②line, = plot(x, y)
+   line.set_linewidth(1.5)
+④lines = plot(x, y)
+   setp(lines, 'linewidth', 1.5)
+⑥setp(lines, linewidth=1.5)
+
+# 用来改变线条的所有属性都包含在matplotlib.lines.Line2D中。
+使用help()自己看
+
+# 关于颜色，可以接受很多类型的颜色参数（#eeefff、(0.3,0.3,0.3)、'red'、'r'等）
+很多方法接受颜色参数，如title('this is an example', color='red')
+
+# 坐标轴背景色
+subplot(111, axisbg=(0.1843, 0.3098, 0.3098))
+
+
+#--* 设置刻度、刻度标签和网格
+figure()是一个图形用户界面；一个图形包括一个或多个子区subplot()，子区能以规则网格方式排列;
+如需更多控制，我们需要使用matplotlib.axes.Axes类的坐标轴实例。这样可以把plot放置到图形窗口的任意位置！！！例如把一个大的plot放到小的plot里。
+
+# 刻度
+刻度定位器（tick locator）指定刻度所在的位置；
+刻度格式器（tick formatter）指定刻度显示的样式；
+
+刻度有主刻度（major ticks）和次刻度（minor ticks）；默认不显示次刻度。
+
+主、次刻度可以被独立地指定位置和格式化。
+
+# pyplot.locator_params()控制刻度定位器的行为：
+ch03-rec07-ticks-locators.py
+
+# 也可以用locator类完成相同的设置，主定位器为10的倍数
+ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(10))
+
+# 刻度格式器的配置十分简单。格式器规定了值的显示方式，例如使用matplotlib.ticker.FormatStrFormatter 可以方便地指定 
+'%2.1f' 或者 '%1.1f cm' 的格式字符串作为刻度标签；
+然后，我们可以用matplotlib.dates.date2num()、matplotlib.dates.num2date()和matplotlib.dates.drange()这样的helper方法对日期进行不同形式的转换。
+ch03-rec08-tick-formatters.py
+
+
+#--* 添加图例和注释
+如何对图形中特定点进行注解，以及如何创建和放置数据图例？
+ch03-rec09-legend-and-annotations.py
+
+
+# --* 移动轴线到图中央
+如何移动轴线到图中央？
+# 轴线定义了数据区域的边界，把坐标轴刻度标记连接起来。一共有四个轴线，可以放置在任何位置。
+默认放置在边界，所有我们会看到数据图有一个框。
+ch03-rec10-spines.py
+
+# 补充说明：
+set_smart_bounds(True)，matplotlib会尝试以一种复杂的方式设置边界，例如处理颠倒的界限，或者在数据延伸出视图的情况下裁剪线条以适应视图。
+
+
+# --* 绘制2D直方图
+术语：表示一定间隔下数据点频率的垂直矩形称为bin，bin以固定的间隔创建，因此直方图的总面积等于数据点的数量；
+直方图可以显示数据的相对频率，这时总面积=1；
+ps:怎样计算bin数量有几种不同的理论，具体还要看真实的数据分布；
+ch03-rec11-hist.py
+
+
+# --* 绘制误差条形图
+可以用误差条来可视化数据集合中的测量不确定度（uncertainty of measurement）或者指出错误。
+误差条可以很容易地表示出误差偏离数据集合的情况。他们可以显示一个标准差（standard deviation）、一个标准误差（standard error）或者95%的置信区间（confidence interval）。
+ch03-rec12-errorbar.py
+
+# 补充：非对称误差条
+
+
+# --*饼图
+ch03-rec13-pie-chart.py
+
+
+#--* 绘制带填充区域的图表
+如何对曲线下面的区域或者两个曲线之间的区域进行填充
+ch03-rec14-filled-plot.py
+
+# 补充：
+fill_betweenx()针对水平曲线
+fill()提供对任意多边形填充颜色或者阴影线
+
+
+#--* 绘制带彩色标记的散点图
+两个变量之间的相互关系（correlation）。
+散点图中，每个数据点的坐标位置由变量的值决定，自变量（或无关变量，independent variable）和应变量（或相关变量，dependent variable），应变量通常绘制在y轴上。
+ch03-rec16-scatter.py
+
+# 散点图通常在应用拟合回归函数之前绘制，用来识别两个变量之间的关联。它能很好的呈现相关性的视觉画面，尤其是非线性关系的数据。
+
+
+
+
+/*---------------------------------------------更多图表和定制化-----------------------------------------------------*/
+#--* 设置坐标轴标签的透明度和大小
+matplotlib组织图标的方式：
+最上层是一个Figure实例，该实例包含一个实例字段Figure.Axes，Axes实例几乎包含了所有我们关心的东西，如所有的线、点、刻度和标签。（当调用plot()方法时，就会向Axes.lines列表添加一个线条实例；如果绘制一个直方图hist()，就会向Axes.patches列表添加许多矩形）
+Axes.XAxis和Axes.YAxis分别管理x、y坐标轴、标签、刻度、刻度标签、定位器和格式器的绘制。
+ch04_rec01_label_shadow.py
+
+# 补充，如果不满足与matplotlib.patheffects目前提供的效果，可以继承matplotlib.patheffects._Base类，并重写draw_path方法。
+https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/patheffects.py#L47
+
+
+# --* 为图表线条或矩形添加阴影效果
+需要使用matplotlib.transforms 模块：该模块知道如何将给定坐标从其坐标系与显示坐标系互相转换。
+现有坐标系:Data坐标系，Axes坐标系（（0，0）表示轴的左下角，（1，1）表示轴的右上角），Figure（（0，0）表示图表的左下角，（1，1）表示图表的右上角）。
+ch04_rec02_line_shadow.py
+
+
+#--* 像图表添加数据表
+如何在图表中的图形旁边添加一个数据表格？
+ch04_rec03_plot_with_table.py
+
+# 补充：
+直接创建一个matplotlib.table.Table实例，可以得到更多的控制。
+使用Axes.add_table(table)方法把matplotlib.table.Table实例添加到axes。
+
+
+# --* 使用subplots（子区）
+如何在plot中创建定制的子区配置项，以更高级的方式使用子区？
+子区的基类是matplotlib.axes.SubplotBase，子区是matplotlib.axes.Axes的实例；
+matplotlib.figure.SubplotParams类，包含subplot所有参数；
+脚本层matplotlib.pyplot包含操作子区的一些helper方法；
+创建共享x轴或y轴的子区，通过sharex或sharey关键字参数来完成：设置为True或all（该轴所有子区共享），none或False（不共享），row（每一个子区行共享该轴坐标），
+col（每一个子区列共享该轴坐标）；
+matplotlib.pyplot.subplots方法返回一个（fig，ax）元组，ax可以是一个坐标轴实例，也可以是坐标轴实例的数组；
+我们用matplotlib.pyplot.subplot_adjust来调整子区布局，关键字参数指明图表中子区的坐标（left，right，bottom，top），其值为归一化的图表大小的值，wspace和hspace
+参数指定子区间空白区域的大小，其值为相应宽度和高度的归一化值。
+
+# 使用helper函数——subplot2grid，定义网格的几何形状和子区的位置。也可以使用colspan和rowspan来让子区跨越给定网格中的多个行和列。
+ch04_rec04_subplots.py
+
+# 补充说明：
+以下是另一种方式定制化axes或者subplot：
+axes = fig.add_subplot(111)
+rectangle = axes.patch
+# 该patch字段代表当前axes实例的背景，可以更新该实例的属性，进而更新axes的背景，如：改变颜色或添加背景图片。。。
+rectangle.set_facecolor('blue')
+或
+fig = plt.figure()
+axes = fig.add_subplot(111)
+rect = matplotlib.patches.Rectangle((1,1), width=6, height=12)
+axes.add_patch(rect)
+# we have to manually force a figure draw
+axes.figure.canvas.draw()
+
+
+# --* 定制化网格
+# 我们需要使用matplotlib.pyplot.grid()来设置网格可见度、密度和风格等。
+函数参数which可以是'major','minor','both'，控制仅通过主刻度或次刻度，或者两个刻度来操作网格；
+参数axis分别控制水平刻度和垂直刻度，值为'x','y','both';
+其他属性通过kwargs参数传入，代表一个matplotlib.lines.Line2D实例可以接受的标准属性集合。
+ru :
+ax.grid(color='g', linestyle='--', linewidth=1)
+
+ch04_rec05_custom_grids.py
+
+
+# --* 绘制等高线
+
+
+#--* 填充图表底层区域
+# 绘制一个填充多边形的基本方法是使用matplotlib.pyplot.fill。
+该方法接收和matplotlib.pyplot.plot相似的参数，及多个x、y对和其他Line2D属性，返回被添加的Patch实例的列表。
+
+# 另外还有matplotlib.pyplot.fill_between()和matplotlib.pyplot.fill_betweenx()函数，
+前者填充y轴的值之间的区域，后者填充x轴的值之间的区域！
+
+fill_between接收参数x（数据的x轴数组）和y1及y2（数据点y轴数组），通过参数指定条件来决定要填充的区域，条件是一个布尔条件，通常指定y轴值范围，默认值None，表示填充所有区域。
+例子：
+t = np.arange(0,1000)
+y = np.sqrt(t)
+plt.plot(t, y, color='red', lw=2)
+plt.fill_between(t, y, color='silver')
+plt.show()
+
+如何为特定的图形交集区域填充阴影？
+ch04_rec08_fill_under.py
+
+
+#--* 绘制极线图
+如何改变图表中使用的坐标系，并以极坐标系（半径r和角度theta）代替？
+polar()函数用于绘制极线图，接收参数数组角度和半径，以及其它和plot()函数相同的格式化参数；
+我们还需要通过add_axes或add_subplot提供参数polar=True！！！
+设置半径网格或者角度，需要使用matplotlib.pyplot.rgrids()来切换半径网格的显示或者设置标签；
+通用使用matplotlib.pyplot.thetagrids()来配置角度刻度和标签。
+ch04_rec10_polar.py
+
+# 如何可视化具有比例大小的文件系统树？
+ch04_rec11_filesystem.py
+
+
+
+
+
+/*-------------------------------------------------------创建3D可视化图表---------------------------------------------------------*/
+mpl_toolkits工具包包含一些拓展工具，其中mpl_toolkits.mplot3d工具包提供了一些3D绘图功能。支持散点图（scatter）、曲面图（surf）、线图（line)和网格图（mesh）。
+
+# --* 3D柱状图
+ch05_rec01_3dbar.py
+
+
+# --* 3D直方图
+ch05_rec02_3dhist.py
+
+
+# --* 创建动画
+ch05_rec03_matplotlib_anim.py
+
+
+# --* 用OpenGL制作动画
+在python中使用最多的一些构造在OpenGL上的库和框架：
+Mayavi: 一个专门用于3D的库；
+Pyglet: 这是有一个纯python的图形库；
+Glumpy: 构建在Numpy之上的快速图形渲染库；
+Pyglet和OpenGL：用来可视化大数据（百万级数据点的）
+
+
+
+
+
+
+
+
+/*-------------------------------------------------------用图像和地图绘制图表---------------------------------------------------------*/
+# --* 用PIL库做图像处理
+1.Image模块：
+im = Image.open(filename) :加载图像
+im.crop(box): 裁剪图像（例如box = (0,100,100,100)左上右下）
+im.filter(filter)：为图像应用一个滤波器，返回滤波后的图像
+im.histogram()：返回图像的直方图列表
+im.resize(size, filter)：重新调整图像大小，并使用一个滤波器进行重新采样。可能的滤波器有NEAREST、BILINEAR、BICUBIC、ANTIALIAS
+im.rotate(angle, filter)：逆时针选择图像
+im.split()：分离图像波段（band），并返回一个单一波段的元组，这对于分离一个RGB图像为三个单独波段十分有用
+im.transform(size, method, data, filter)：用data和filter对一个给定的图像做转换，转换类型可以是AFFINE、EXTENT、QUAD和MESH，data设定了原始图像中转换被应用的区域；
+
+2..ImageDraw模块，允许我们在图像上绘图，可以用arc、ellipse、pieslice、point和polygon等函数来修改所加载的图像内容；
+
+3.ImageChops模块，包含一些图像通道操作函数，这些函数可以被用于图像合成、着色、特以及其他处理操作，通道操作仅限于8比特的图像：
+ImageChops.duplicate(image)：拷贝当前图像到一个新的图像对象
+ImageChops.invert(image)：反转一副图像并返回一个副本，注意是反转颜色！
+ImageChops.difference(iamge1, image2)：在不用目测的情况下验证两幅图是否相同十分有效！
+
+4.ImageFilter模块，包含了卷积核（convolution kernels）类的实现，这些类允许我们创建定制化的卷积核。模块还包含了一些功能健全的常用滤波器，我们能在图像上应用这些著名的滤波器（BLUR和MedianFilter）：
+ImageFilter提供了两种过滤器：固定的图像增强滤波器和需要指定参数的滤波器
+查看所有固定滤波器：[f for f in dir(ImageFilter) if f.isupper()]；
+
+
+#--* 如何在任意可支持的图像上应用所有当前支持的固定滤波器
+ch06_rec01_01_pil_demo.py
+
+
+#--*如何处理某一特定文件夹下的所有图像文件（按给定比例调整大小）
+ch06_rec01_02_pil_thumbnails.py
+
+
+# --* 绘制带图像的图表
+如何在数据上放置图像，把数据值和它们要展示的内容映射起来？
+我们使用Bobby Henderson创作的故事中的一个虚构的例子，作者把海盗数和海面温度关联起来，为了强调这种关联，我们用测量了海面温度的相同年份的海盗数量按比例显示成海盗船的大小：
+ch06_rec04_01_img_in_figure.py
+
+
+# --* 在具有其他图形的图表中显示图像
+如何简单但有效地使用matplotlib库来处理图像通道，并显示外部图像的单通道直方图？
+
+# 本例将演示如何搭建一个图像直方图查看器，该查看器可以显示红、绿、蓝三个通道的图像直方图
+ch06_rec02_01_figimage.py
+
+
+#--* 在地图上绘制图像？？
+先略。。。
+
+
+#--*生成CAPTCHA图像
+如何利用python图像库来生成图像、渲染点和线，以及渲染文本？
+ch06_rec06_01_captcha.py
+
+#reCAPTCHA(http://www.google.com/recaptcha)
+
+
+
+
+
+
+
+
+
+/*-------------------------------------------------------使用正确的图表理解数据---------------------------------------------------------*/
+# --* 理解对数图
+# 根据经验，遇到以下情况可以考虑使用对数标度:
+1.当然展示的数据的值跨越好几个量级时；
+2.当要展示的数据有朝向大值（一些数据点比其他数据大很多）的倾斜度时；
+3.当要展示变化率（增长率），而不是值的变化时。
+
+# 根据数据范围的不同，应该使用不同的对数底，如：如果数据范围比较小，选择以2为低会更有帮助。
+
+# 如果数据分布存在一个正偏态，例如工资，取值的对数能让数据更合乎模型，因为对数变换能提供一个更加正常的数据分布。
+
+# --*
+下例展示上述的内容：
+ch07_rec01_understand_log_plot.py
+
+
+# --* 理解频谱图
+频谱图是一个随时间变化的谱表现，它显示了信号的频谱强度随时间的变化。
+频谱图是把声音或其他信号以可视化的方式呈现。
+
+
+# --* 创建火柴杆图
+# 一个二维的火柴杆图（stem plot）把数据显示为沿x轴的基线延伸的线条。圆圈（默认值）或者其他标记表示每个杆的结束，其y轴表示了数据值；
+不要把火柴杆图和茎叶图（stem and leaf plot）混淆，茎叶图是把最不重要的数值表示为叶，把较高位的值表示为茎的一种数据表现方法；
+真实世界中，任何离散序列数据都可以恰当地用火柴杆图来可视化。
+
+
+# 绘制离散序列为杆，数据值表示为每个杆末端的标记
+ch07_rec04_stemplot.py
+
+
+# --* 绘制矢量场流线图
+略
+
+
+# --* 使用颜色表
+用颜色来编码数据会极大地影响观察者如何理解可视化图形！
+
+#如下颜色表：
+1.Sequential 这表示同一颜色从低饱和度到高饱和度的两个色调的单色颜色表，例如从白色到天蓝色。对大多数情况下这是理想的，
+因为这些颜色清晰地显示了颜色值从低到高的变化；（亮度单调地递减）
+2.Diverging 这表示中间值，是颜色的中值（通常是一些明亮的颜色），然后颜色范围在高和低两个方向上变化到两个不同的色调。
+这对于有明显中值的数据是理想的。例如，当中值是 0时，能清晰地显示负值和正值之间的区别；（中间亮度最高，向两端递减）
+3.Qualitative 对于数据没有固定的顺序，并且想要让不同种类的数据之间能够轻易区分开的情况，可以选用该颜色表；（不同种类的颜色用来区分不同的数据类别）
+4.Cyclic 当数据可以围绕端点值显示的时候，用该颜色表非常方便，例如表示一天的时间、风向或者相位角；（）
+
+# 还有一些可用的颜色表：
+brg 这表示一个发散型的蓝-红-绿颜色表
+bwr 这表示一个发散型的蓝-白-红颜色表
+coolwarm 对于3D阴影，色盲和颜色排序非常有用
+rainbow 表示一个有发散亮度的紫-蓝-绿-黄-橙-红光谱颜色表
+seismic 表示一个发散型蓝-白-红颜色表
+terrain 表示地图标记的颜色（蓝、绿、黄、棕和白）
+
+这里展示的大多数颜色表，可以通过在颜色表的名字后面加上_r后缀，进行反转。例如hot_r是对hot的反向循环；
+
+# 最基本常用的颜色表：
+autumn、bone、cool、copper、flag、gray、hot、hsv、jet、pink、prism、sprint、summer、winter和spectral。
+
+# Yorick科学可视化包
+
+# 在matplotlib中可以为许多项目设置颜色表。例如，颜色表可以设置在image，pcolor和scatter上。通过在cmap函数调用时传入一个参数
+来完成。参数接受一个colors.Colormap的实例。
+也可以使用matplotlib.pyplot.set_map为绘制在坐标轴上的最新对象设置cmap。
+通过matplotlib.pyplot.colormaps()可以容易地得到所有可用的颜色表。
+
+# 示例：
+ch07_rec09_colormaps.py
+
+# 通过matplotlib.rcParams上做一些定制：例如为大多数图表设置默认颜色表 matplotlib.rcParams['axes.cycle_color']
+
+# 注册自己的颜色表，略
+
+# 对于基本颜色表，除了使用cmap参数指定外，还可以直接使用pylab快捷方式：
+如，imshow(X) hot() 直接将图像X的颜色表设置为cmap='hot'
+
+
+# --* 使用散点图和直方图
+# 可以从google trends门户网站获取给定参数相关搜索量的归一化值数据！
+ch07_rec08_scatterplot.py
+
+
+# --* 补充，给散点图添加直方图
+ch07_rec08_scatterhist.py
+
+
+# --* 绘制两个变量间的互相关图形
+# 使用matplotlib.pyplot.xcorr函数，这个函数可以绘制两个数据集合之间的相互关系，通过这种方式可以看出在绘制的值之间是否存在某个显著的模式。
+如果传入的normed参数为True，可以通过0th（也就是说，当没有时间延迟或者时差时）延迟的互关联对数据进行归一化。
+ch07_rec07_xcorrelation.py
+
+# 互相关图表，通过相关值的高度（出现在某个时间延迟的竖线）表现相关系数，告诉我们这两个信号不相关。
+我们可以看到有不止一条竖线（在时间延迟n上的相关系数）在0.5之上。
+
+
+# --* 自相关的重要性
+acorr函数
+自相关表示在一个给定的时间序列或一个连续的时间间隔上其自身的延迟（也就是时间上的延迟）版本之间的相似度。应用在时间序列分析中。
+自相关可以帮我们解答：
+数据是随机的吗？这个时间序列数据是一个白噪声信号吗？它是正弦曲线形的吗？它是自回归的吗?这个时间序列数据的模型是什么？
+ch07_rec06_autocorrelation.py
+
+
+
+
+
+
+
+
+/*-------------------------------------------------------更多的matplotlib知识---------------------------------------------------------*/
+# --* 绘制箱线图
+在一幅图表中可视化一系列的测量（或观测）数据来显示这些数据的属性（如中值、数据扩散和数据分布），箱线图很可能是进行分布比较最合适不过图表了。
+ch08_rec03_whiskers.py
+
+
+# --* 甘特图
+ch08_rec04_gantt.py
+
+
+# --* 误差条
+ch08_rec05_errorbar.py
+
+
+# --* 使用文本和字体属性
+基本文本操作API:
+matplot.pyplot	    |	matplotlib API		|		描述
+text		    |    matplotlib.axes.Axes.text	|       在指定的位置（x, y）为坐标轴添加文本，fontdict参数允许我们设置一般字体属性，kwargs设置特定属性
+xlabel		    |    matplotlib.axes.Axes.set_xlabel     |       设置x轴标签，labelpad参数指定标签和x轴间距
+ylabel		    |    matplotlib.axes.Axes.set_ylabel     |       同上，y轴
+title                              |    matplotlib.axes.Axes.set_title        |       设置坐标轴的标题。接受所有一般的文本属性，如fontdict和kwargs
+suptitle                        |    matplotlib.figure.Figure.suptitle    |       为图表添加一个居中标题。通过kwargs接收所有通用文本属性。使用Figure坐标
+figtext		    |    matplotlib.figure.Figure.text          |       在图表的任意位置添加文本。位置通过x、y定义，使用图表的归一化坐标。fontdict、kwrags
+
+窗口或者数据坐标中用于绘制和保存文本的基类是matplotlib.text.Text类，其属性如下：
+属性 	               |                         		|      	描述
+family	               |       			|      字体名称或类型
+size或fontsize         | 			|       字体大小
+style或fontstyle      |			|      字体风格
+variant		|			|      字体变体形式
+weight或fontweight|			|     指定字体粗细或者使用一个特定的粗细的字符串
+stretch或fontstretch|			|     字体拉伸
+fontproperties	|			|     存储并管理字体属性
+
+# ch08_rec06_textfont.py
+
+
+# --* 用LaTex渲染文本
+略
+
+
+# --* pyplot  和 OO API
+略

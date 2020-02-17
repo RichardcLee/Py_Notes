@@ -1,0 +1,134 @@
+
+#--* 数据预处理：数据清洗、数据集成、数据压缩、数据转换。另外：异常值检测、降维。
+
+#--* 数据处理（两种最受欢迎的处理方法）：聚类和依存模型。
+
+#--* 数据集资源：
+??http://grouplens.org（来自明尼苏达大学）
+??http://ichart.finance.yahoo.com/table.csv?s=YHOO&c=1962
+??http://datawrangling.com/some-datasets-available-on-the-web
+??http://weather-warehouse.com(天气数据)
+??http://www.bjs.gov/developer/ncvs/（Justics统计局）
+??http://census.ire.org/data/bulkdata.html（人口普查数据）
+??http://www.pro-football-reference.com（足球参考）
+??http://www.basketball-reference.com（篮球参考）
+??htttp://www.baseball-reference.com（棒球参考）
+??http://archive.ics.uci.edu/ml/datasets.html（机器学习）
+??http://www.pewresearch.org/data/download-datasets/
+??http://archive.ics.uci.edu/ml/datasets/Heart+Disease（心脏病）
+？？http://www.knapdata.com/python/ucdavis.csv
+
+
+#--* 两个关于数据可视化的例子资源：
+数据可视化（http://euclid.psych.yorku.ca/datavis/）
+The Work of Edward Tufte and Graphics Press(www.edwardtufte.com/tufte)
+
+
+#--* 一些可视化方法
+--条形图和饼图
+--箱线图
+--气泡图
+--直方图
+--核密度估计（KDE）图
+--线面图
+--网络图
+--散点图
+--树状图
+--小提琴图
+--雷达图
+--蜘蛛图
+--热力图
+
+
+#--* 数据可视化时需要关注：
+--数据选色是否正确？
+--数据大小被标准化了吗？数据点大小意味着什么？
+--坐标轴代表什么？
+--要处理的变量有多少？
+
+------------一些建议
+
+# --* 条形图：
+--增加条形颜色，获得更多效果
+--有时，多个条形图绘制在一张图表中
+--沿着连续数轴画正反两面的数据是一种发现趋势的有效方法
+--用层叠或并排的条形（在彼此上部或旁边展示相关数据）
+example: bar.py
+
+# --* 饼图：
+--限制饼图扇形数不超过8个，否则请考虑条形图
+--在图上叠加饼图
+example: pie.py
+
+# --* 箱线图：
+--确定数据是左偏还是右偏
+--识别、关注离群点
+--跨分布比较：箱线图适用于快速比较不同数据集的分布
+
+# --* 散点图（变量相关性）：
+--散点图最适合研究不同变量间的关系
+--增加一条趋势线或最佳拟合线（如果关系是线性的），可以展示数据之间的相关性
+--使用信息标记类型：通过颜色和形状提高视觉效果来解读数据
+
+# --* 气泡图（散点图的基础上加上第3维，数据点大小（=数据的定量值））
+--气泡图最适用于展示沿两个坐标轴的数据信息，以及第三个显著测度的数据元素
+--增加形状和颜色的显著性
+--变为交互式：若数据点过多，气泡图会过于复杂，因此需要在时间轴或类别上，对数据分组
+
+# --* 核密度估计图（Kernel Density Estimation, KDE）是一种用来估计概率密度函数的非参数方法。 
+核密度函数与直方图密切相关。
+example: kde_seaborn.py
+kde_numpy_scipy.py
+
+
+# --* 一个案例：
+体育案例.py
+数据：qb_data.csv，22名四分卫球员信息
+问题： 2015年2月美国足球四分卫球员的前5个最高纪录是哪几个？
+
+
+体育案例2.py
+问题：哪位四分卫球员职业生涯最长？现在还有人能超越Peython Manning触地得分记录的四分卫球员吗？
+
+
+# --* 交互式可视化：D3.js(javascript） 或 Plotly(Python)
+例1：国情咨文（D3.js）
+http://twitter.github.io/interactive/sotu2015/#p35
+
+例2：美国死亡率 '''死亡率是以100 000人为单位衡量的。'''
+美国死亡率.py（mortality1.csv)（按性别划分=>男性死亡率的降低导致了总体死亡率的降低！）
+
+美国死亡率2.py（mortality1.csv)（划分不同的年龄层=>寿命一直在增加，尤其25岁以下年龄组有最大改善。为什么25-44岁年龄组的人口会下跌？因为在那段时间了AIDS导致了较大的死亡数！）
+
+
+# --* 交互式可视化包：Bokeh和Vispy
+
+# --* 提高效率的编程技巧：如果在循环结构中需要调用有前缀符号的函数（如：math.sin），最好对它起一个本地别名。
+
+#--* scipy：scipy.cluster 包含用于聚类分析的函数
+	   scipy.fftpack 快速傅里叶变换
+	        scipy.sparse 处理图（有向图、无向图、流网络等）
+                等等
+
+# --* Trie树（前缀树），一种优秀的存储结构，可以非常有地用于搜索、插入和删除。
+用字典实现！
+
+ 
+# --* 词云 wordcloud 包
+词云.py
+
+
+# --* TextBlob 文本处理包，也包含情感分析功能
+
+
+# --* 体育案例3.py
+球队价值是衡量球队水平的重要指标，冠军数量也具有重要参考价值。用x轴表示年份，y轴表示冠军数量，气泡大小代表每年平均获得冠军数。
+
+
+# --* igraph、NetworkX、Graph-toll 处理图论内容的库
+
+# --* PyMC、StochPy 建立随机区组模型的库
+
+
+# --* 绘制动态图表（动画）
+useAnimation.py

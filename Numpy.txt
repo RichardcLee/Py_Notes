@@ -1,0 +1,1233 @@
+#Numpy = Numerical Python
+numpy库，用来高效处理数组和矩阵，比list高效得多
+包含很多实用的数学函数：线性代数运算、傅里叶变换、随机数等。
+
+# 索引方式，4种：
+x = np.arange(-4, 5)
+1.标量选择
+2.切片
+3.数值索引，如：x[[1]] == -3
+4.逻辑索引，如：x[[True, False, True, 略]]
+
+
+#
+速度比较：
+import sys
+from datetime import datetime
+import numpy as np
+def numpysum(n):
+    a = np.arange(n)**2
+    b = np.arange(n)**3    
+    return a+b
+	
+def pythonsum(n):
+    a = range(n)
+    b = range(n)
+    c = []    
+    for i in range(len(a)):
+        a[i] = i**2
+        b[i] = i**3
+        c.append(a[i]+b[i])
+    return c
+	
+# size = int(sys.argv[0])
+size =  10000
+start = datetime.now()
+c = pythonsum(size)
+delta = datetime.now() - start
+print('the last elements in c:', c[-2:])
+print('pythonsum elapsed time', delta.microseconds, 'ms')    
+start = datetime.now()
+c = numpysum(size)
+delta = datetime.now() - start
+print('the last elements in c:', c[-2:])
+print('numpysum elapsed time', delta.microseconds, 'ms')
+
+
+
+# --*
+数据类型
+np.float64(42)
+np.float16(42)
+np.int32(42)
+np.bool(42)
+np.float(False)
+# 数据类型列表
+np.sctypeDict.keys()
+
+>>> import numpy as np
+>>> np.empty((5, 3))	# 创建未初始化的矩阵
+>>> a_list = [1,2,3]
+>>> #创建数组
+>>> an_array = np.array(a_list)
+>>> #创建数组，每个元素取平方
+>>> np.arrray(a_list)**2
+>>> #创建矩阵并指定数据类型
+>>> an_array = np.array(a_list, dtype=float)
+>>> an_array
+array([1., 2., 3.])
+>>> a_listoflist = [[1,2,3],[4,5,6],[7,8,9]]
+>>> #创建矩阵
+>>> a_matrix = np.matrix(a_listoflist,dtype=float)
+>>> a_matrix
+matrix([[1., 2., 3.],
+        [4., 5., 6.],
+        [7., 8., 9.]])
+>>> #元素个数
+>>> a_matrix.size
+9
+>>> #返回矩阵的行列数，数组每一维的大小
+>>> a_matrix.shape
+(3, 3)
+>>> #维数
+>>> a_matrix.ndim
+2
+>>> #换种方式创建数组
+>>> created_array = np.arange(1, 10, dtype=float)
+>>> created_array
+array([1., 2., 3., 4., 5., 6., 7., 8., 9.])
+>>> #可以指定步长
+>>> created_array = np.arange(1,10,2,dtype=int)
+>>> created_array
+array([1, 3, 5, 7, 9])
+>>> #另一种方式创建数组
+>>> created_array = np.linspace(1,10)
+>>> #另一种方式创建数组
+>>> created_array = np.logspace(1,10, base=10)
+>>> #创建特殊矩阵和数组
+>>> ones_array = np.ones(3)
+>>> zeros_array = np.zeros(4)
+>>> ones_matrix = np.ones((3,3))
+>>> zeros_matrix = np.zeros((4,4))
+>>> #鉴别矩阵
+>>> np.eye(N=3,M=3,k=0)
+array([[1., 0., 0.],
+       [0., 1., 0.],
+       [0., 0., 1.]])
+>>> np.eye(N=3,k=1)
+array([[0., 1., 0.],
+       [0., 0., 1.],
+       [0., 0., 0.]])
+>>> np.eye(N=3,k=2)
+array([[0., 0., 1.],
+       [0., 0., 0.],
+       [0., 0., 0.]])
+>>> np.eye(N=3,k=3)
+array([[0., 0., 0.],
+       [0., 0., 0.],
+       [0., 0., 0.]])
+>>> # --*数组的整形
+>>> np.arange(10)
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> np.arange(10).reshape((2,5))
+array([[0, 1, 2, 3, 4],
+       [5, 6, 7, 8, 9]])
+
+>>> a = np.arange(9).reshape(3,3)
+>>> a
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+>>> a[::-1]
+array([[6, 7, 8],
+       [3, 4, 5],
+       [0, 1, 2]])
+>>> a.flatten()
+array([0, 1, 2, 3, 4, 5, 6, 7, 8])
+
+>>> # --* 随机数
+>>> general_random_numbers = np.random.randint(1,100,size=10)
+>>> general_random_numbers
+array([29, 27, 82, 18,  1, 59, 37, 16,  7, 31])
+>>> # loc均值 scale标准差，正态分布
+>>> uniform_random_numbers = np.random.normal(loc=0.2,scale=0.2,size=(3,3))
+>>> uniform_random_numbers
+array([[0.30401475, 0.33780193, 0.26140624],
+       [0.21557092, 0.14194955, 0.11062848],
+       [0.06158208, 0.34127407, 0.24195933]])
+>>> #low最小值 high最大值，均匀分布
+>>> np.random.uniform(low=1,high=10,size=10)
+array([9.66070221, 9.7694976 , 6.66698473, 3.01798055, 2.22019533,
+       1.89479965, 9.08309522, 6.78354825, 6.8687398 , 7.67914978])
+>>> #对应元素相加
+>>> a+b
+>>> #对应元素相乘
+>>> a*b
+>>> #对应元素相除
+>>> a/b
+>>> #矩阵相乘
+>>> c = np.dot(a,b)
+>>> 列的和
+>>> a.sum(axis=0)
+array([ 9, 12, 15])
+>>> 行的和
+>>> a.sum(axis=1)
+array([ 3, 12, 21])
+
+
+
+/*-----------------基础知识----------------*/
+# --*
+创建多维数组
+m = np.array([np.arange(2), np.arange(2)])
+print(m.shape)
+# 每个元素占内存字节数
+print(m.dtype.itemsize)
+
+
+# --* 创建自定义的异构数据类型,可作为数据库、表格等的一行数据的数据结构。
+from numpy import dtype
+# 包含三个属性name、numitems、price的数据类型
+t = dtype([('name', str, 40), ('numitems', 'int32'),('price','float32')])
+print(t)
+print(t['name'])
+itemz = np.array([('meaning of life DVD', 42, 3.14),('Butter',13,2.72)], dtype=t)
+print(itemz)
+
+
+# --* 链接数组与单个元素
+x = np.random.random(100)
+y = np.r_[x, -45, 95, 100, -100]
+
+
+#--* 可以以这样的方式筛选元素
+x = np.random.uniform(-10,10,size=100)
+x[lambda x: x<=5]
+
+
+# --*
+一维数组的切片和索引同python列表
+#
+多维数组ndarray的切片和索引
+# 三维数组，假设视为层、排、列
+b = np.arange(24).reshape(2,3,4)
+# 1层1排1列
+b[0,0,0]
+# 所有层1排1列
+b[:,0,0]
+# 1层所有排、列
+b[0,:,:] # 可用...代替多个:， 等价于 b[0, ...]
+# 1层2排所有列
+b[0,1] # b[0,1,:]
+# 1层2排所有列+切片
+b[0,0,::2]
+# 所有层所有排第二列的元素
+b[...,1] 
+# 所有层第二排所有列
+b[:,1] #等价于 b[:,1,:]
+# 第1层所有位于第二列的元素
+b[0,:,1]
+# 第1层最后1列的元素
+b[0,:,-1]
+# 反向选取第1层最后1列的元素
+b[0,::-1,-1]
+# 切片
+b[0,::2,-1]
+# 翻转 层
+b[::-1]
+
+
+# --*
+改变数组的维度，将数组展平
+b.ravel() # 只返回一个视图
+b.flatten() # 会请求内存来保存结果
+b.shape = (6,4) #直接修改原数组
+b.reshape(1,24)
+b.resize(1,24) #同reshape 但是会直接修改原数组
+
+# 转置
+b.T == b.transpose()
+
+
+# --*
+ 数组的组合
+a = np.arange(9).reshape(3,3)
+b = 2*a
+
+# 水平组合
+np.hstack((a,b))
+#或者
+np.concatenate((a,b), axis=1)
+
+# 垂直组合
+np.vstack((a,b))
+# 或者
+np.concatenate((a,b), axis=0)
+
+# 深度组合
+np.dstack((a,b))
+
+# 列组合
+# 一维数组按列方向进行组合
+oned = np.arange(2)
+twiced_oned = oned*2
+np.column_stack((oned, twiced_oned))
+# 对于二维数组，效果同hstack
+np.column_stack((a, b)) == np.hstack((a,b))
+
+# 行组合
+# 一维数组按行组合为二维数组
+np.row_stack((oned,twiced_oned))
+# 二维数组同vstack
+np.row_stack((a,b)) == np.vstack((a,b))
+
+
+# --*
+数组分割
+b = np.split(a,5) # 分割为五个等大数组
+
+#水平分割
+np.hsplit(a,3) #沿水平方向分割为三个等大子数组
+# 或者
+np.split(a,3,axis=1)
+
+# 垂直分割 
+np.vsplit(a,3) #沿水平方向分割为三个等大子数组
+split(a,3,axis=0)
+
+# 深度分割
+c = arange(27).reshape(3,3,3)
+np.dsplit(c,3)
+
+
+# --*
+数组的属性
+b = np.arange(24).reshape(2,12)
+
+# 数组维数
+b.ndim
+
+# 数组元素个数
+b.size
+
+# 数组中元素在内存中所占字节数
+b.itemsize
+
+# 整个数组所占存储空间
+b.nbytes
+b.nbytes == b.size * b.itemsize
+
+# 数据类型,class
+b.dtype
+
+# 转置
+b.T
+
+# 复数数组
+b = np.array([1.j+1, 2.j+3])
+b.real # 实部
+b.imag # 虚部
+
+# flat属性返回一个numpy.flatiter对象，
+这个扁平迭代器可以让我们像遍历一维数组一样去遍历任意的多维数组
+b = np.arange(4).reshape(2,2)
+f = b.flat
+# 遍历
+for item in f:
+    print(item)
+
+# 获取某个或多个元素
+b.flat[2]
+b.flat[[1,3]]
+
+# 该属性可以赋值，赋值将导致数组元素被覆盖
+b.flat = 7 # 整个数组所有元素变为7
+b.flat[[1,3]] = 1 # 第2和第4个元素变为1
+
+
+# --*
+数组的转换
+# 转换成列表
+b.tolist()
+# 转换时指定数据类型
+b.astype(int)
+
+
+
+/*-----------------------------------常用函数--------------------------------------*/
+# --*
+numpy 文件读写
+# 创建单位矩阵，参数指定矩阵中元素1的个数
+i2 = np.eye(2)
+# 将数组保存到文件中
+np.savetxt("eye.txt", i2)
+
+# --*
+ CSV文件（Comma-Separeated Value，逗号分隔值格式）
+'''
+	data.csv 格式如下：AAPL,28-01-2011, ,344.17,344.3,333.53,336.1,21144800
+	分别代表股票表示，日期，空，开盘价、最高价、最低价、收盘价、当日成交量
+
+'''
+# 指定文件分隔符为','，获取第6、7字段的数据，unpack意味着分拆存储两列的数据，即分别存于c,v
+c,v = np.loadtxt('data.csv', delimiter=',', usecols=(6,7), unpack=True)
+
+
+
+# --*
+#
+成交量加权平均价格(VWAP:Volume-Weighted-Average Price),非常重要的经济学量，以成交量为权重计算平均价格
+c,v = np.loadtxt('data.csv', delimiter=',', usecols=(6,7), unpack=True)
+vwap = np.average(c, weights=v)
+
+# 算术平均数
+mean = np.mean(c)
+
+#
+时间加权平均价格 TWAP，最近的价格重要性大一些，予以较大的权值
+
+
+
+# --*
+取值范围
+
+# 求最大值和最小值
+h,l = np.loadtxt('data.csv', delimiter=',', usecols=(4,5), unpack=True) # 获取最高价列和最低价列
+np.max(h)  # h.max()
+np.min(l)  # l.min()
+
+# 获取最大值和最小值的索引
+np.argmax(h)
+np.argmin(l)
+
+# 计算数组的取值范围（即极差），即max-min
+np.ptp(h)  # h.ptp()
+np.ptp(l)  # l.ptp()
+
+# 中位数
+np.median(c)
+
+# 排序
+c2 = np.msort(c)
+
+# 方差
+np.var(c) # c.var()
+# 即
+np.mean((c-c.mean())**2)
+
+
+
+# --*
+股票收益率:简单收益率和对数收益率，投资者最感兴趣的是收益率的方差或标准差，它们代表了投资风险的大小
+
+#
+简单收益率：是指相邻两个价格之间的变化率
+#np.diff()返回由相邻数组元素的差值构成的数组，少1个元素
+returns = np.diff(arr)/arr[:-1] #简单收益率
+#计算标准差
+np.std(returns)
+
+# 对数收益率：是指所有价格取对数之后两两之间的差值，由于log a-log b = log a/b，对数收益率也可以用来衡量价格的变化率
+#np.log计算每个元素的对数
+logreturns = np.diff(np.log(c)) #对数收益率
+
+#
+where函数返回所有满足条件的数组元素的索引
+np.where(returns > 0) # 返回为正值的简单收益率
+
+# 对应的, take函数可以取到索引对应的元素
+indices = np.where(c > 344)
+np.take(c, indices)
+
+#
+波动率(volatility)是对价格变动的一种度量，计算历史波动率需要用到对数收益率。年波动率等于对数收益率的标准差除以其均值，再除以交易日倒数的平方根，通常交易日取252天。
+annual_volatility = np.std(logreturns)/np.mean(logreturns)
+annual_volatility = annual_volatility/np.sqrt(1/252)
+
+monthly_volatility = annual_volatility*np.sqrt(1/12)
+
+
+# --*
+ 日期分析，注意numpy是面向浮点数的
+
+dates,close=np.loadtxt('data.csv',delimiter=',
+',usecols=(1,6),unpack=True)
+ 会报错！！！
+
+#参数converters是数据列和转换函数之间映射的字典，键代表数据列序号，值为函数
+def datestr2num(s):
+    return datetime.datetime.strptime(s, '%d-%m-%Y').date().weekday()
+
+dates,close=np.loadtxt('data.csv',delimiter=',',usecols=(1,6),converters={1:datestr2num},unpack=True)
+
+# 参数 skiprows 忽略行
+
+#计算各个日期的平均收盘价(星期1到五)
+averages = np.zeros(5)
+for i in range(5):
+    indices = np.where(dates == i)
+    prices = np.take(close, indices)
+
+avg = np.mean(prices)
+print('Day',i,"prices",prices,"Average",avg)
+averages[i] = avg
+	
+
+# numpy中数组的维度也称作轴。
+np.apply_along_axis(func1d, axis, arr, *args, **kwargs)会调用另一个自定义函数，作用于轴上的每一个数组元素。	
+需制定自定义函数，轴，目标数组和自定义函数参数。
+
+# np.savetxt('summary.csv', summary, delimiter=',', fmt="%s")
+保存数组到文件，需制定参数：文件名，数组名，分隔符，存储浮点数的格式（特定格式字符串）。
+
+
+# --*
+真实波动幅度均值（ATR：Average True Range）是一个用来衡量股价波动性的技术指标。
+ATR基于N个交易日的最高价和最低价计算，通常取最近20个交易日。
+
+
+# np.maximum(arr1,arr2,arr3,...) 在一组数组中按照元素挑选最大值，即在所有数组中第一个元素的最大值，第二个元素的最大值等。
+>>> a = np.array([10,20,30,40,50,-100])
+>>> b = np.array([11,19,29,41,55,-101])
+>>> np.maximum(a,b)
+array([  11,   20,   30,   41,   55, -100])
+
+# 与此对应的 np.minimum() 
+
+
+
+# --*
+简单移动平均线（simple moving average）通常用于分析时间序列上的数据。
+N = 5
+weights = np.ones(N) / N
+c = np.loadtxt('data.csv', delimiter=',', usecols=(6,), unpack=True)
+sma = np.convolve(weights, c)[N-1:-N+1]
+t = np.arange(N-1,len(c))
+plt.plot(t, c[N-1:], lw=1.0)
+plt.plot(t, sma, lw=2.0)
+plt.show()
+
+#卷积是分析数学中的一种重要运算，定义为一个函数与经过翻转和平移的另一个函数的乘积的积分。
+np.convolve(a, v, mode='full')是numpy的卷积函数库
+
+
+
+# --*
+指数移动平均线（exponential moving average）
+N = 5
+weights = np.exp(np.linspace(-1., 0., N))
+weights /= weights.sum()
+c = np.loadtxt('data.csv', delimiter=',', usecols=(6,), unpack=True)
+ema = np.convolve(weights, c)[N-1:-N+1]
+t = np.arange(N-1, len(c))
+plt.plot(t, c[N-1:], lw=1.0)
+plt.plot(t, ema, lw=2.0)
+plt.show()
+
+# 计算数组每个元素i的指数 e^i 值
+x = np.arange(5)
+np.exp(x)
+# linspace 需要一个起始值和终止值参数，以及可选的元素个数参数，返回一个在指定范围内均匀分布的数组。
+np.linspace(-1, 0, 5)
+
+
+
+# --*
+布林带又是一种技术指标，刻画价格波动的区间。由三条轨道线组成的带状通道。
+中轨 简单移动平均线或指数移动平均线
+上轨 比中轨高两倍标准差的距离，这里的标准差指计算中轨线是所用数据的标准差
+下轨 比简单移动平均线低两倍标准差的距离
+N =5
+weights = np.ones(N) / N
+c = np.loadtxt('data.csv', delimiter=',', usecols=(6,), unpack=True)
+sma = np.convolve(weights, c)[N-1:-N+1]  # 两遍各少去N-1个数
+deviation = []
+C = len(c)
+
+for i in range(N-1, C):
+    if i+N<C:
+        dev = c[i: i+N]
+    else:
+        dev = c[-N:]
+    averages = np.zeros(N)
+    averages.fill(sma[i-N-1])
+    dev = dev - averages
+    dev = dev **2
+    dev = np.sqrt(np.mean(dev))
+    deviation.append(dev)
+
+deviation = 2 * np.array(deviation)
+upperBB = sma + deviation
+lowerBB = sma - deviation
+
+c_slice = c[N-1:]
+between_bands = np.where((c_slice < upperBB)&(c_slice > lowerBB))
+between_bands = len(np.ravel(between_bands))
+t = np.arange(N-1,C)
+plt.plot(t, c_slice, lw=1.0)
+plt.plot(t, sma, lw=2.0)
+plt.plot(t, upperBB, lw=3.0)
+plt.plot(t, lowerBB, lw=4.0)
+plt.show()
+
+# numpy的fill函数可以将数组元素的值全部设置为一个指定的标量值，比使用array.flat或者遍历更快。
+>>> a
+array([  10,   20,   30,   40,   50, -100])
+a.fill(100)
+>>> a
+array([100, 100, 100, 100, 100, 100])
+
+# np.dot(a,b) 求向量a和b的点积
+
+
+# --*
+ndarray 方法(np.var/sum/std/argmax/argmin/mean等均有对应的ndarray方法)
+
+#数组修剪和压缩
+#clip方法返回一个修剪过的数组，将所有比给定最大值还大的元素全部设为给定的最大值，而所有比给定最小值还小的元素全部设为给定的最小值。
+a = np.arange(5)
+a.clip(1, 2)
+#compress方法返回一个根据给定条件筛选后的数组。
+a = np.arange(4)
+a.compress(a > 2)
+
+# 阶乘
+# pord方法，计算数组中所有元素的乘积
+b = np.arange(1,9)
+b.prod()
+# cumprod方法，计算数组中每一个元素的阶乘
+b.cumpord()
+
+# --* 
+numpy 的 linalg 包专门用于线性代数计算。
+
+
+
+/*-----------------------------------便捷函数--------------------------------------*/
+# 计算协方差
+np.cov(a,b)
+#查看对角线上的元素
+a.diagonal()
+#计算矩阵的迹，即对角线元素之和
+a.trace()
+#计算相关系数（矩阵）
+np.corrcoef(a,b)
+# 多项式拟合 
+np.ployfit
+# 多项式之差
+np.ploysub
+# 多项式函数求根
+np.roots()
+
+# --*
+成交量(volume)可以表示价格波动的大小。OBV(On-Balance Volume，净额成交量或能量潮指标)。
+
+# sign函数返回数组中每个元素的正负符号
+np.sign(a)
+
+# piecewise可以分段给定取值，使用合适的返回值和对应的条件调用该函数
+np.piecewise(a, [a<0, a>0], [-1,1]) # a<0返回-1，a>0返回1
+
+# 判断两个数组是否相等
+np.array_equal(a,b)
+ 
+# --* 避免循环，减少循环
+# numpy中vectorize相当于python中的map
+func = np.vectorize(my_function)
+func(a)
+
+
+
+# --*
+数据平滑
+噪声数据很难处理，通常需要对其进行平滑处理，除了计算移动平均线，还可以使用
+numpy的hanning函数，hanning是一个加权余弦的窗函数。
+N = 8
+weights = np.hanning(N)
+
+appl = np.loadtxt('data.csv', delimiter=',',usecols=(6,),unpack=True)
+returns = np.diff(appl)/appl[:-1]
+smooth_appl = np.convolve(weights/weights.sum(), returns)[N-1:-N+1]
+
+t = np.arange(N-1, len(returns))
+plt.plot(t, returns[N-1:], lw=1.0)
+plt.plot(t, smooth_appl, lw=2.0)
+plt.show()
+
+# select函数可以根据一组给定的条件，从一组元素中选择出符合条件的元素并返回数组
+cond = [True,False,True,False]
+arr = [100,200,300,400]
+np.select([cond],[arr])
+>>>array([100,   0, 300,   0])
+
+#  np.trim_zeros可以去掉数组开头和结尾的零
+
+# 其他平滑函数：hamming、blackman、bartlett、kaiser使用方法与hanning类似
+
+
+
+/*---------------------------------矩阵和通用函数------------------------------*/
+# --*
+矩阵是ndarray的子类，是二维数组。可用mat matrix bmat创建矩阵。
+# 用特定格式的字符串创建矩阵
+A = np.mat('1 2 3; 4 5 6; 7 8 9')
+# 转置
+A.T
+# 逆矩阵,O (3)时间按复杂度
+A.I
+
+# 使用numpy数组创建矩阵
+np.mat(np.arange(9).reshape(3,3))
+
+# 分块矩阵，使用一些已有的小的矩阵创建一个新的大的矩阵,block matrix = bmat
+A = np.eye(2)
+B = A * 2
+np.bmat("A B; A B") # 使用字符串创建复合矩阵
+
+
+# --*
+通用函数 输入一组标量，输出一组表量，如加减乘除等。
+# zeros_like函数可以创建一个和a形状相同，且元素全部为0
+的数组
+np.zeros_like(a)
+
+# 使用np.frompyfunc创建通用函数
+
+# 通用函数并非真正的函数，它有四个方法，不过这四个方法只能对输入两个参数，输出一个参数的ufunc对象有效，因此只能在二元通用函数上调用：reduce,accumulate,reduceat,outer.
+
+# 在 add函数上分别调用四个方法
+a = arange(9)
+# 对于add函数，在数组上的reduce计算结果等价于对数组元素求和
+np.add.reduce(a)
+# accumulate方法同样可以递归作用于输入数组，但与reduce不同的是他将存储运算的中间结果并返回。在add上调用accumulate方法等价于直接调用cumsum函数。
+np.add.accumulate(a) 
+# 参数是一个输入数组和一个索引值列表
+np.add.reduceat(a, [0, 5,2,7])
+# 
+np.add.outer(np.arange(3), a)
+
+
+# --*
+算术运算，numpy中基本算数运算+、-和*隐式关联着（自动调用）add、substract、multiply。除法运算涉及三个通用函数divide、true_divide和floor_division，以及对应的运算符/和//。
+
+# 除法运算
+# divide 
+a = np.array([2,6,5])
+b = np.array([1,2,3])
+np.divide(a,b) == a/b
+# true_divide 同 divide
+# floor_divide总是返回整数结果，向下取整
+np.floor_divide(a,b) == a//b
+
+# 模运算，计算模数或者余数，可以使用mod、remainder和fmod函数，或%运算符，差异主要在于处理负数的方式，fmod异于其他函数。
+# remainder逐个返回两个数组中元素相除后的余数，如果第二个数字为0直接返回0
+a = np.arange(-4,4)
+np.remainder(a, 2)
+# mod 与remainder作用完全一致
+# % 同remainder
+# fmod处理负数的方式与前三者不同：所得余数的正负由被除数决定，与除数无关。
+np.fmod(a, 2)
+
+# np.rint 对浮点数取整，结果仍为浮点数
+np.rint(a)
+
+# numpy中所有标准三角函数均有对应的通用函数。
+
+# 绘制莉萨如曲线
+a = 9;b=8
+t = np.linspace(-np.pi, np.pi, 201)  # 常量np.pi
+x = np.sin(a * t + np.pi / 2)
+y = np.sin(b * t)
+plt.plot(x,y)
+plt.show()
+
+
+# 绘制方波，下面的代码尝试用numpy函数替换循环？！！！
+t = np.linspace(-np.pi, np.pi, 201)
+k = np.arange(1, 99)
+k = 2 * k - 1
+f = np.zeros_like(t)
+
+for i in range(len(t)):
+    f[i] = np.sum(np.sin(k * t[i]) / k)
+
+f = (4 / np.pi) * f
+plt.plot(t,f)
+plt.show()
+
+# 可以这样做？
+func = np.vectorize(lambda x: np.sum(np.sin(k*x)/k))
+f = func(t)
+
+
+# 锯齿波和三角波，尝试去掉循环？
+t = np.linspace(-np.pi,np.pi,201)
+k = np.arange(1, float(99))
+f = np.zeros_like(t)
+
+for i in range(len(t)):
+    f[i] = np.sum(np.sin(2 * np.pi * k * t[i]) / k)
+
+f = (-2 / np.pi) * f
+plt.plot(t, f, lw=1.0)
+plt.plot(t, np.abs(f), lw=2.0)  # 取绝对值！
+plt.show()
+
+# 可以这样做？
+func = np.vectorize(lambda x: np.sum(np.sin(2 * np.pi * k * x) / k))
+f = func(t)
+
+
+# --* 位操作和比较操作
+位操作函数可以在整数或者整数数组的位上进行操作，他们都是通用函数。^、&、|、<<、>>等位操作在numpy中都有对应。
+# 异或 ^ 对应 bitwise_xor，小于 < 对应 less，下面代码检测符号是否一致
+x = np.arange(-9, 9)
+y = -x
+(x ^ y) < 0 == np.less(np.bitwise_xor(x,y), 0 )  
+
+# & 对应 bitwise_and，== 对应equal，下面代码检测是否是2的幂数，注意2
+的2进制表示
+(x & (x-1)) == 0
+np.equal((np.bitwise_and(x, x-1)), 0)
+
+# << 对应 left_shift
+
+
+
+/*---------------------------------深入学习numpy模块-------------------------------*/
+# --*
+numpy.linalg 线性代数
+可以计算逆矩阵，求特征值，解线性方程组以及求解行列式等
+# 逆矩阵
+np.linalg.inv(A) == A.I
+A.I * A = 单位矩阵
+
+# 求解线性方程组 Ax = b型
+'''
+ 1x1 -   2x2 + 1x3 =  0
+ 0x1 +  2x2  - 8x3 =  8
+-4x1 + 5x2 + 9x3 = -9
+'''
+A = np.mat("1 -2 1;0 2 -8;-4 5 9")
+b = np.array([0, 8 , -9])
+x = np.linalg.solve(A, b)
+np.dot(A, x)  # 检查结果是否正确
+
+# 求解特征值(eigenvalue)和特征向量(eigenvector)
+A = np.mat("3 -2;1 0")
+# 求特征值
+np.linalg.eigvals(A)
+# 求解特征值和特征向量(返回一个元组)
+eigenvalues, eigenvector = np.linalg.eig(A)
+
+# 奇异值分解(SVD Singular Value Decomposition)
+np.linalg.svd(A, full_matrices=False)
+
+# 广义逆矩阵，inv只接受方阵，而pinv没有这个限制
+np.linalg.pinv(A)
+
+# 行列式(determinant)
+np.linalg.det(A)
+
+# 
+FFT(Fast Fourier Transform，快速傅里叶变换)是一种高效的计算DFT(Discrete Fourier Transform，离散傅里叶变换)的算法。numpy中fft模块提供了快速傅里叶变换的功能
+
+# 创建包含30个点的余弦波信号
+x = np.linspace(0, 2*np.pi, 20)
+wave = np.cos(x)
+
+# 使用fft对余弦波信号进行傅里叶变换
+transformed = np.fft.fft(wave)
+
+# 变换后的结果应用ifft，应该可以近似的还原初始信号
+np.all(np.abs(np.fft.ifft(transformed) - wave) < 10**-9) # ifft后数组中所有元素与原来数组中的元素差值的绝对值小于10的-9次幂
+
+# plt.plot(wave)
+plt.plot(transformed)
+plt.show()
+
+# 移频
+shifted = np.fft.fftshift(transformed)
+
+# 逆操作 
+np.all((np.fft.ifftshift(shifted) - transformed) < 10**-9)
+
+plt.plot(transformed, lw=2)
+plt.plot(shifted, lw=3)
+plt.show()
+
+
+# --*
+np.random 随机数
+
+# 
+二项分布(binomial distribution)
+'''
+硬币赌博游戏，每一轮抛9枚硬币，如果少于5枚硬币正面朝上，损失赌注中的一份；否则，赢得一份赌注。初始资本为1000份赌注。
+'''
+
+# 初始化一个全0的数组来存放剩余资本。10000轮硬币赌博游戏。
+cash = np.zeros(10000)	# 10000轮 
+cash[0] = 1000	# 初始资本，1000份赌注
+outcome = np.random.binomial(9, 0.5, size=len(cash))  # 参数 n, p , size
+
+# 模拟每一轮抛硬币的结果并更新cash数组。打印出最大值和最小值，以检查输出中是否有任何异常值
+for i in range(1, len(cash)):
+    if outcome[i] < 5:
+        cash[i] = cash[i-1] - 1
+    elif outcome[i] < 10:
+        cash[i] = cash[i-1] +1
+    else:
+        raise AssertionError("Unexpected outcome " + outcome)
+
+print(outcome.min(), outcome.max())
+
+# 绘制，呈现随机游走(random walk)状态
+plt.plot(np.arange(len(cash)), cash, lw=0.5)
+plt.show()
+
+
+#
+ 超几何分布(hypergeometric distribution)
+# 模拟游戏秀节目
+'''
+有这样一个游戏秀节目，每当参赛者答对一个问题，他们可以从一个罐子中摸出3个球并放回。罐子里有一个“倒霉球”，一旦这个球被摸出，参赛者会被扣去6分。而如果他们摸出的3个球均来自其余25个普通球，那么可以得到1分。因此，如果一共有100道问题被正确回答，得分情况如何?
+'''
+
+# 使用hypergeometric函数初始化游戏的结果矩阵。该函数的第一个参数为罐子中普通球的数量，第二个参数为“倒霉球”的数量，第三个参数为每次采样（摸球）的数量
+points = np.zeros(100)
+outcomes = np.random.hypergeometric(25, 1, 3, size=len(points)) # 参数 ngood nbad nsample size
+
+# 计算得分
+for i in range(len(points)):
+    if(outcomes[i] ==3):
+        points[i] = points[i-1] + 1
+    elif(outcomes[i] == 2):
+        points[i] = points[i-1] - 6
+    else:
+        print(outcomes)
+
+# 绘制
+plt.plot(np.arange(len(points)), points)
+plt.show()
+
+
+#
+ 连续分布 可以用PDF, Probability Density Function, 概率密度曲线描述。
+numpy.random有一系列产生连续分布的函数——beta、chisquare、exponential、f、gamma、gumbel、laplace、lognormal、logistic、multivariate_normal、noncentral_chisquare、noncentral_f、normal等。
+
+# 绘制正态分布
+N = 10000
+normal_values = np.random.normal(size=N)
+# 绘制分布直方图和理论上的概率密度函数（均值为0、方差为1的正态分布）曲线
+dummy, bins, dummy = plt.hist(normal_values, int(np.sqrt(N)), normed=True,  lw=1.0)
+sigma = 1
+mu = 0
+plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) * np.exp( - (bins -mu)**2 / (2 * sigma**2) ), lw=2.0)
+plt.show()
+
+
+#
+ 对数正态分布(lognormal distribution)
+N =10000
+lognormal_values = np.random.lognormal(size=N)
+dummy, bins, dummy = plt.hist(lognormal_values, int(np.sqrt(N)), normed=True, lw = 1.0)
+sigma = 1
+mu = 0
+x = np.linspace(min(bins), max(bins), len(bins))
+pdf = np.exp(-(np.log(x) - mu)**2 / (2 * sigma**2)) / (x * sigma * np.sqrt(2 * np.pi))
+plt.plot(x, pdf, lw =3)
+plt.show()
+
+
+
+/*-------------------------------------专用函数-----------------------------------*/
+# --*
+排序
+sort 返回排序后的数组
+lexsort 根据键值的字典序经行排序
+argsort 返回输入数组排序后的下标
+ndarray类的sort 对数组原地排序
+msort 沿着第一个轴排序
+sort_complex 对复数按先实部后虚部排序
+
+
+# --*
+搜索
+argmax 返回数组中最大值对应的下标
+nanargmax 功能相同，但忽略NaN值
+argmin
+nanargmin
+argwhere 根据条件搜索非零元素，并分组返回对应的下标
+searchsorted 可以为指定的插入值寻找维持数组排序的索引位置
+extract 返回满足条件的数组元素
+
+a = np.array([2, 4, 8])
+np.argmax(a)
+b = np.array([np.nan, 2, 8])
+np.nanargmax(b)
+np.argwhere(a <= 4)
+
+# 使用searchsorted为指定的插入值寻找维持数组排序的索引位置，从这个位置插入可以保持数组的有序性
+a = np.arange(5)
+indices = np.searchsorted(a, [-2, 7])
+np.insert(a, indices, [-2, 7])
+
+# extract可以根据某个条件从数组中抽取元素，和where相似，nonzero专门用来抽取非零元素
+a = np.arange(7)
+condition = (a % 2) == 0  # !
+np.extract(condition, a)
+np.nonzero(a)
+
+
+# --*
+众多的金融函数.......
+
+
+# --*
+窗函数(window function)是信号处理领域常用的数学函数,
+如：bartlett、blackman、hamming、hanning、kaiser。
+
+# 巴特利窗（Bartlett window），一种三角形平滑窗
+window = np.bartlett(42)
+plt.plot(window)
+plt.show()
+
+# 布莱克曼窗(blackman window)形式上为三项余弦值的加和
+window = np.blackman(42)
+plt.plot(window)
+plt.show()
+
+# 汉明窗(hamming window)形式上是一个加权的余弦函数
+window = np.hamming(42)
+plt.plot(window)
+plt.show()
+
+# 凯泽窗(Kaiser window)是以贝塞尔函数定义的
+window = np.kaiser(42, 14)
+plt.plot(window)
+plt.show()
+
+
+# --*
+专用数学函数
+
+# 贝塞尔函数
+x = np.linspace(0, 4, 100)
+vals = np.i0(x) # Modified Bessel function of the first kind, order 0. 第一类修正的零阶贝塞尔函数
+plt.plot(x, vals)
+plt.show()
+
+# sinc函数在数学和信号处理领域被广泛应用
+x = np.linspace(0, 4, 100)
+vals = np.sinc(x)
+plt.plot(x, vals)
+plt.show()
+
+# sinc2d
+x = np.linspace(0, 4, 100)
+xx = np.outer(x, x)
+vals = np.sinc(xx)
+plt.imshow(vals)
+plt.show()
+
+
+
+/*-------------------------------------质量控制---------------------------------------*/
+numpy.testing支持numpy代码的单元测试
+
+
+
+/*--------------------------------matplotlib绘图-------------------------------------*/
+示例图库:http://matplotlib.sourceforge.net/gallery.html
+雅虎财经频道可以下载数据
+
+# --* 
+简单绘图 pyplot包含了简单绘图功能。
+
+# 
+绘制多项式函数
+# 以自然数序列作为多项式系数，使用poly1d创建多项式
+func = np.poly1d(np.array([1,2,3,4]).astype(float))
+# 创建x轴的值
+x = np.linspace(-10, 10, 30)
+# 计算多项式的值
+y = func(x)
+
+plt.plot(x, y)
+plt.xlabel("x")
+plt.ylabel("y(x)")
+plt.show()
+
+#
+绘制多项式函数及其导函数
+func = np.poly1d(np.array([1,2,3,4]).astype(float))
+# 求1阶导!!!
+func1 = func.deriv(m=1)
+x = np.linspace(-10,10,30)
+y = func(x)
+y1 = func1(x)
+plt.plot(x, y, 'ro', x, y1, 'g--')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+#
+子图
+func = np.poly1d(np.array([1,2,3,4]).astype(float))
+x = np.linsapce(-10, 10, 30)
+y = func(x)
+func1 = func.deriv(m=1)
+y1 = func1(x)
+func2 = func.deriv(m=2)
+y2 = func2(x)
+# 使用subplot创建子图，第一个参数是子图的行数，第二个参数是列数，第三个参数是一个从1开始的序号；也可以将三个参数结合成一个数字如331（3行3列序号1）
+plt.subplot(311)
+plt.plot(x, y, 'r-')
+plt.title('Polynomial')
+
+plt.subplot(312)
+plt.plot(x, y1, 'b^')
+plt.title('First Derivative')
+
+plt.subplot(313)
+plt.plot(x, y2, 'go')
+plt.title('Second Derivative')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.show()
+
+
+# --*
+绘制全年股票价格
+from matplotlib.dates import DateFormatter
+from matplotlib.dates import DayLocator
+from matplotlib.dates import MonthLocator
+from matplotlib.finance import quotes_historical_yahoo
+from matplotlib.finance import candlestick
+import sys
+from datetime import date
+import matplotlib.pyplot as plt
+
+today = date.today()
+start = (today.year - 1, today.month, today.day)
+# 创建定位器（locator）
+alldays = DayLocator()
+months = MonthLocator()
+# 创建日期格式化器（date formatter）以格式化x轴上的日期
+mont_formatter = DateFormatter("%b %Y")
+# 从雅虎财经频道下载股价数据
+quotes = quotes_historical_yahoo(symbol, start, today)
+# 创建一个figure对象，这是绘图组件的顶层容器
+fig = plt.figure()
+# 增加一个子图
+ax = fig.add_subplot(111)
+# 将x轴上的主定位器设置为月定位器，负责x轴上较粗的刻度
+ax.xaxis.set_major_locator(months)
+# 将x轴上的次定位器设置为日定位器，负责x轴上较细的刻度
+ax.xaxis.set_minor_locator(alldays)
+# j将x轴上的主格式化器设置为月格式化器，负责x轴上较粗刻度的标签
+ax.xaxis.set_major_formatter(month_formatter)
+# 使用finance 包的函数绘制K线图
+candlestick(ax, quotes)
+# 将x轴上的标签格式化为日期。为了更好地适应x轴的长度，标签将被旋转。
+fig.autofmt_xdate()
+plt.show()
+
+
+# --*
+直方图(histogram)
+y = np.random.normal(loc=10, scale=4, size=50)
+plt.hist(y, int(np.sqrt(len(y))))
+plt.show()
+
+
+# --* 
+对数坐标图，当数据范围很大时，很有用。
+matplotlib中有semilogx（对x轴取对数）、semilogy（对y轴取对数）和loglog（同时对x、y轴取对数）
+
+
+# --*
+散点图（scatter plot）
+c, v = np.loadtxt('data.csv', delimiter=',', usecols=(6,7), unpack=True)
+
+ret = np.diff(c)/c[:-1]
+volchange = np.diff(v)/v[:-1]
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+# 使得数据点的颜色与ret相关，大小与volchange相关
+ax.scatter(ret, volchange, c=ret * 100, s = volchange * 100, alpha=0.5)
+ax.set_title('close and volume returns')
+ax.grid(True)
+plt.show()
+
+
+# --*
+着色 fill_between函数
+c = np.loadtxt('data.csv', delimiter=',', usecols=(6,), unpack=True)
+x = np.arange(len(c))
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.plot(x, c)
+# 对下方区域着色，依据低于和高于均值使用不同的颜色填充
+plt.fill_between(x, c.min(), c, where=c>c.mean(), facecolor="green", alpha=0.4)
+plt.fill_between(x, c.min(), c, where=c<c.mean(), facecolor="red", alpha=0.4)
+ax.grid(True)
+plt.show()
+
+
+# --*
+图例和注释 legend annotate
+
+
+# --*
+三维空间
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+
+fig = plt.figure()
+# z = x^2 = y^2
+ax = fig.add_subplot(211, projection='3d')
+u = np.linspace(-1, 1, 100)
+# 使用meshgrid创建一个二维坐标网络
+x, y  = np.meshgrid(u, u)
+z = x**2 + y**2
+ax.plot_surface(x, y, z, rstride=4, cstride=4, cmap=cm.YlGnBu_r)
+
+# z = x^-4 + y^2
+ax = fig.add_subplot(212, projection='3d')
+z = x**-4 + y**2
+ax.plot_surface(x,y,z)
+
+plt.show()
+
+
+#  --*
+等高线图
+fig = plt.figure()
+ax = fig.add_subplot(111)
+u = np.linspace(-1,1,100)
+x, y = np.meshgrid(u,u)
+z  = x**2 + y**2
+ax.contourf(x,y,z)
+plt.show()
+
+
+# --*
+动画
+import matplotlib.animation as animation
+fig = plt.figure()
+ax = fig.add_subplot(111)
+N = 10
+x = np.random.rand(N)
+y = np.random.rand(N)
+z = np.random.rand(N)
+circles, triangles, dots = ax.plot(x, 'ro', y, 'g^', z, 'b.')
+ax.set_ylim(0, 1)
+plt.axis('off')
+
+def update(data):
+    circles.set_ydata(data[0])
+    triangles.set_ydata(data[1])
+    return circles, triangles
+
+def generate():
+    while True: yield np.random.rand(2, N)
+
+anim = animation.FuncAnimation(fig, update, generate, interval=1000)
+plt.show()
+
+/*-----------------------------科学计算拓展scipy------------------------------------*/
+
+ 

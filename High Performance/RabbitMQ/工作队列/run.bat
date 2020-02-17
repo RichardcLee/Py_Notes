@@ -1,0 +1,5 @@
+start cmd /k "echo start work1...&&python worker.py"
+start cmd /k "echo start work2...&&python worker.py"
+start cmd /k "echo start work3...&&python worker.py"
+# start cmd /k "echo start work4...&&python worker.py"
+start cmd /k "echo start new_task...&&python new_task.py"

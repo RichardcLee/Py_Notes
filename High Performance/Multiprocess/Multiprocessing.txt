@@ -1,0 +1,100 @@
+代码见Multiprocess文件夹
+/*-------------------------------python 多进程----------------------------*/
+
+#--* multiprocessing 模块提供了一个Process类来代表进程对象。
+1.py 控制台运行会报错！！！！
+
+# 解释:
+创建子进程时，只需要传入一个执行函数和函数的参数，创建一个Process实例，用start()方法启动；
+join()方法可以等待子进程结束后再继续往下运行，通常用于进程间同步。
+os.getpid()返回当前进程id；
+os.getppid()返回父进程id；
+
+
+#--* Pool 如果要启动大量子进程，可以使用进程池的方式批量创建子进程。
+2.py
+
+# 解释：
+对Pool对象调用join()方法会等待所有子进程执行完毕，调用join()之前必须先调用close()，
+调用close()之后就不能继续添加新的Process了。
+Pool(num)，可指定同时执行的进程数，但如果超过CPU核数就需要等待。
+
+
+#--* subprocess模块，可以方便地启动一个子进程，然后控制子进程的输入和输出
+# 下面代码将演示直接在python代码中执行命令行指令：nslookup www.python.org
+import subprocess
+
+if __name__ == '__main__':
+    print('nslookup www.python.org')
+    r = subprocess.call(['nslookup', 'www.python.org'])
+    print('Exit code:', r)
+
+# 如果子进程还需要输入，可以通过communicate()方法输入：
+3.py
+
+#  解释：
+代码相当于在命令行执行命令nslookup 然后手动输入 
+set q=mx
+python.org
+exit
+
+
+#--* 进程间通信
+Process之间肯定需要通信，multiprocessing模块包装了底层机制，提供了Queue、Pipes等多种方式来交换数据。
+4.py
+
+
+#--* 分布式进程
+使用multiprocessing.managers
+
+ 
+# --*start working with processed in python
+called_Process.py
+calling_Process.py
+
+
+# --* how to spawn a process
+spawn_a_process.py
+
+
+# --* how to name a process
+naming_process.py
+
+
+# --* how to run a process in the background
+background_process.py
+
+
+# --* how to kill a process
+kill_a_process.py
+
+
+# --* how to use a process in subclass
+subclass_process.py
+
+
+# --* use queue to exchange objects
+using_queue.py
+
+
+# --* use pipes to exchange objects
+using_pipes.py
+
+
+# --* how to synchronize processes
+- Lock
+- Event
+- Condition
+- Semaphore
+- RLock
+- Barrier
+
+process_barrier.py
+
+
+# --* how to manage a state between process
+manager.py
+
+
+# --* how to use a process pool
+process_pool.py
